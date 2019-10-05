@@ -1,4 +1,4 @@
-package DigitDP;
+package TwoDimensional;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -9,59 +9,40 @@ import java.util.InputMismatchException;
 /**
  * Author : AMIT KUMAR GUPTA
  * e-mail : amitguptapc@gmail.com
- * Date : 20/09/19
- * Time : 8:00 PM
- * Problem Code : ClassyNumbers
- * Platform : CodeForces
+ * Date : 02/10/19
+ * Time : 8:16 PM
+ * Problem Code : MCM
+ * Platform : InterviewBit
  */
 
-public class ClassyNumbers {
+public class MCM {
 
     private static long MOD = 1000000007;
 
     // begin of solution
-    private static long[][][] dp;
-    private static String s;
-
-    private static void reset() {
-        for (int i = -0; i < 20; i++)
-            for (int j = 0; j < 4; j++)
-                for (int k = 0; k < 2; k++)
-                    dp[i][j][k] = -1;
-    }
-
-    private static long solve(int pos, int count, int tight) {
-        if (pos == s.length())
-            return 1;
-        if (dp[pos][count][tight] != -1)
-            return dp[pos][count][tight];
-        int end = (tight == 1) ? s.charAt(pos) - '0' : 9;
-        long ans = 0;
-        for (int i = 0; i <= end; i++) {
-            int cnt = count + (i > 0 ? 1 : 0);
-            if (cnt <= 3)
-                ans += solve(pos + 1, cnt, tight & (i == end ? 1 : 0));
+    private static int minCost(int[] a, int n) {
+        int[][] dp = new int[n][n];
+        for (int i = 1; i < n; i++) {
+            int s = 0, e = i;
+            while (e < n) {
+                dp[s][e] = Integer.MAX_VALUE;
+                for (int j = s; j < e; j++)
+                    dp[s][e] = Math.min(dp[s][e], dp[s][j] + dp[j + 1][e] + a[s] * a[j + 1] * a[e + 1]);
+                s++;
+                e++;
+            }
         }
-        return dp[pos][count][tight] = ans;
+        return dp[0][n - 1];
     }
 
     public static void main(String[] args) throws IOException {
         AmitScan sc = new AmitScan();
         AmitPrint pr = new AmitPrint();
-        int t = sc.si();
-        while (t-- > 0) {
-            long l = sc.sl();
-            long r = sc.sl();
-            dp = new long[20][4][2];
-            l -= 1;
-            s = r + "";
-            reset();
-            long ans = solve(0, 0, 1);
-            s = l + "";
-            reset();
-            ans -= solve(0, 0, 1);
-            pr.pl(ans);
-        }
+        int n = sc.si();
+        int[] a = new int[n + 1];
+        for (int i = 0; i <= n; i++)
+            a[i] = sc.si();
+        pr.pl(minCost(a, n));
         pr.close();
     }
     // end of solution

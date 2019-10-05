@@ -1,67 +1,63 @@
-package DigitDP;
+package OneDimensional;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 
 /**
  * Author : AMIT KUMAR GUPTA
  * e-mail : amitguptapc@gmail.com
- * Date : 20/09/19
- * Time : 8:00 PM
- * Problem Code : ClassyNumbers
- * Platform : CodeForces
+ * Date : 01/10/19
+ * Time : 7:24 PM
+ * Problem Code : Ladders
+ * Platform : NA
  */
 
-public class ClassyNumbers {
+public class Ladders {
 
     private static long MOD = 1000000007;
 
     // begin of solution
-    private static long[][][] dp;
-    private static String s;
 
-    private static void reset() {
-        for (int i = -0; i < 20; i++)
-            for (int j = 0; j < 4; j++)
-                for (int k = 0; k < 2; k++)
-                    dp[i][j][k] = -1;
+    // DP Solution
+    private static int ladders2(int n, int k) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= k; j++)
+                if (i - j >= 0)
+                    dp[i] += dp[i - j];
+        }
+        return dp[n];
     }
 
-    private static long solve(int pos, int count, int tight) {
-        if (pos == s.length())
+    // Memoized solution
+    private static int[] memo;
+
+    private static int ladders1(int n, int k) {
+        if (n == 0)
             return 1;
-        if (dp[pos][count][tight] != -1)
-            return dp[pos][count][tight];
-        int end = (tight == 1) ? s.charAt(pos) - '0' : 9;
-        long ans = 0;
-        for (int i = 0; i <= end; i++) {
-            int cnt = count + (i > 0 ? 1 : 0);
-            if (cnt <= 3)
-                ans += solve(pos + 1, cnt, tight & (i == end ? 1 : 0));
+        if (memo[n] != -1)
+            return memo[n];
+        int ans = 0;
+        for (int i = 1; i <= k; i++) {
+            if (n - i >= 0)
+                ans += ladders1(n - i, k);
         }
-        return dp[pos][count][tight] = ans;
+        return memo[n] = ans;
     }
 
     public static void main(String[] args) throws IOException {
         AmitScan sc = new AmitScan();
         AmitPrint pr = new AmitPrint();
-        int t = sc.si();
-        while (t-- > 0) {
-            long l = sc.sl();
-            long r = sc.sl();
-            dp = new long[20][4][2];
-            l -= 1;
-            s = r + "";
-            reset();
-            long ans = solve(0, 0, 1);
-            s = l + "";
-            reset();
-            ans -= solve(0, 0, 1);
-            pr.pl(ans);
-        }
+        int n = sc.si();
+        int k = sc.si();
+        memo = new int[n + 1];
+        Arrays.fill(memo, -1);
+        pr.pl(ladders2(n, k));
         pr.close();
     }
     // end of solution

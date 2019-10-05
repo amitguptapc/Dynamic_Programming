@@ -1,67 +1,59 @@
-package DigitDP;
+package TwoDimensional;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 
 /**
  * Author : AMIT KUMAR GUPTA
  * e-mail : amitguptapc@gmail.com
- * Date : 20/09/19
- * Time : 8:00 PM
- * Problem Code : ClassyNumbers
- * Platform : CodeForces
+ * Date : 02/10/19
+ * Time : 8:41 PM
+ * Problem Code : ValentineMagic
+ * Platform : HackerBlocks
  */
 
-public class ClassyNumbers {
+public class ValentineMagic {
 
     private static long MOD = 1000000007;
 
     // begin of solution
-    private static long[][][] dp;
-    private static String s;
+    private static int n, m;
+    private static int[] b, g;
+    private static long[][] dp;
 
-    private static void reset() {
-        for (int i = -0; i < 20; i++)
-            for (int j = 0; j < 4; j++)
-                for (int k = 0; k < 2; k++)
-                    dp[i][j][k] = -1;
-    }
-
-    private static long solve(int pos, int count, int tight) {
-        if (pos == s.length())
-            return 1;
-        if (dp[pos][count][tight] != -1)
-            return dp[pos][count][tight];
-        int end = (tight == 1) ? s.charAt(pos) - '0' : 9;
-        long ans = 0;
-        for (int i = 0; i <= end; i++) {
-            int cnt = count + (i > 0 ? 1 : 0);
-            if (cnt <= 3)
-                ans += solve(pos + 1, cnt, tight & (i == end ? 1 : 0));
-        }
-        return dp[pos][count][tight] = ans;
+    private static long minDiff(int i, int j) {
+        if (i == n)
+            return 0;
+        if (j == m)
+            return Integer.MAX_VALUE;
+        if (dp[i][j] != -1)
+            return dp[i][j];
+        long x = Math.abs(b[i] - g[j]) + minDiff(i + 1, j + 1);
+        long y = minDiff(i, j + 1);
+        return dp[i][j] = Math.min(x, y);
     }
 
     public static void main(String[] args) throws IOException {
         AmitScan sc = new AmitScan();
         AmitPrint pr = new AmitPrint();
-        int t = sc.si();
-        while (t-- > 0) {
-            long l = sc.sl();
-            long r = sc.sl();
-            dp = new long[20][4][2];
-            l -= 1;
-            s = r + "";
-            reset();
-            long ans = solve(0, 0, 1);
-            s = l + "";
-            reset();
-            ans -= solve(0, 0, 1);
-            pr.pl(ans);
-        }
+        n = sc.si();
+        m = sc.si();
+        b = new int[n];
+        g = new int[m];
+        for (int i = 0; i < n; i++)
+            b[i] = sc.si();
+        for (int j = 0; j < m; j++)
+            g[j] = sc.si();
+        Arrays.sort(b);
+        Arrays.sort(g);
+        dp = new long[n][m];
+        for (int i = 0; i < n; i++)
+            Arrays.fill(dp[i], -1);
+        pr.pl(minDiff(0, 0));
         pr.close();
     }
     // end of solution
