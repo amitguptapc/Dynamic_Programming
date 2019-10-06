@@ -9,64 +9,65 @@ import java.util.InputMismatchException;
 /**
  * Author : AMIT KUMAR GUPTA
  * e-mail : amitguptapc@gmail.com
- * Date : 20/09/19
- * Time : 8:35 PM
- * Problem Code : MaxProduct
- * Platform : Codeforces
+ * Date : 07/10/19
+ * Time : 1:02 AM
+ * Problem Code : Total Palindromic Numbers
+ * Platform : CodeChef
  */
 
-public class MaxProduct {
+public class TotalPalinNum {
 
     private static long MOD = 1000000007;
 
     // begin of solution
-    static class Pair {
-        long prod;
-        String str;
+    private static String s;
+    private static long[][][][][][][] dp;
 
-        Pair(long a, String b) {
-            prod = a;
-            str = b;
-        }
+    private static void reset() {
+        for (int i = 0; i < 19; i++)
+            for (int j = 0; j < 2; j++)
+                for (int k = 0; k < 2; k++)
+                    for (int l = 0; l < 2; l++)
+                        for (int m = 0; m < 2; m++)
+                            for (int n = 0; n < 11; n++)
+                                for (int o = 0; o < 11; o++)
+                                    dp[i][j][k][l][m][n][o] = -1;
     }
 
-    private static String a, b;
-    private static Pair[][][][] dp;
-
-    private static Pair solve(int pos, int ta, int tb, int z) {
-        if (pos == a.length())
-            return new Pair(1, "");
-        if (dp[pos][ta][tb][z].prod != -1)
-            return dp[pos][ta][tb][z];
-        int lb = ta == 1 ? a.charAt(pos) - '0' : 0;
-        int ub = tb == 1 ? b.charAt(pos) - '0' : 9;
-        Pair ans = new Pair(0, "");
-        for (int i = lb; i <= ub; i++) {
-            int p;
-            if (z == 0 && i == 0)
-                p = 1;
-            else p = i;
-            Pair temp = solve(pos + 1, ta & (i == lb ? 1 : 0), tb & (i == ub ? 1 : 0), z | (i > 0 ? 1 : 0));
-            ans = (ans.prod > temp.prod * p) ? ans : new Pair(temp.prod * p, i + temp.str);
+    private static long solve(int pos, int tight, int odd, int even, int st, int last, int slast) {
+        if (pos == s.length())
+            return odd == 1 && even == 1 ? 1 : 0;
+        if (dp[pos][tight][odd][even][st][last][slast] != -1)
+            return dp[pos][tight][odd][even][st][last][slast];
+        long ans = 0;
+        int end = tight == 1 ? s.charAt(pos) - '0' : 9;
+        if (st == 0) {
+            ans += solve(pos + 1, tight & (s.charAt(pos) == '0' ? 1 : 0), odd, even, st, last, slast);
+            for (int i = 1; i <= end; i++)
+                ans += solve(pos + 1, tight & (i == end ? 1 : 0), odd, even, 1, i, slast);
+        } else {
+            for (int i = 0; i <= end; i++)
+                ans += solve(pos + 1, tight & (i == end ? 1 : 0), odd | (i == slast ? 1 : 0), even | (i == last ? 1 : 0), 1, i, last);
         }
-        return dp[pos][ta][tb][z] = ans;
+        return dp[pos][tight][odd][even][st][last][slast] = ans;
     }
 
     public static void main(String[] args) throws IOException {
         AmitScan sc = new AmitScan();
         AmitPrint pr = new AmitPrint();
-        a = sc.s();
-        b = sc.s();
-        // make length of both strings equal
-        while (a.length() < b.length())
-            a = '0' + a;
-        dp = new Pair[20][2][2][2];
-        for (int i = 0; i < 20; i++)
-            for (int j = 0; j < 2; j++)
-                for (int k = 0; k < 2; k++)
-                    for (int l = 0; l < 2; l++)
-                        dp[i][j][k][l] = new Pair(-1, "");
-        pr.pl(Long.parseLong(solve(0, 1, 1, 0).str));
+        int t = sc.si();
+        while (t-- > 0) {
+            String a = sc.s();
+            String b = sc.s();
+            dp = new long[19][2][2][2][2][11][11];
+            s = b;
+            reset();
+            long ans = solve(0, 1, 0, 0, 0, 10, 10);
+            reset();
+            s = a;
+            ans -= solve(0, 1, 0, 0, 0, 10, 10);
+            pr.pl(ans);
+        }
         pr.close();
     }
     // end of solution
